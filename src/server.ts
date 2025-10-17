@@ -5,12 +5,17 @@ import { PrismaClient } from "@prisma/client";
 import swaggerUi from "swagger-ui-express";
 import { specs } from "./swagger";
 import { z } from "zod";
+import helmet from "helmet";
+import rateLimit from "express-rate-limit";
+
 
 dotenv.config();
 
 const app = express();
 const prisma = new PrismaClient();
 
+app.use(helmet());
+app.use(rateLimit({ windowMs: 60_000, max: 120 }));
 app.use(cors());
 app.use(express.json());
 app.use("/docs", swaggerUi.serve, swaggerUi.setup(specs));
