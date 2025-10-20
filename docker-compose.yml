@@ -1,4 +1,3 @@
-version: "3.9"
 services:
   db:
     image: postgres:16
@@ -17,23 +16,17 @@ services:
       retries: 10
 
   api:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: adityavshisht/task_manager:api-1.0
+    env_file:
+      - .env.docker
     depends_on:
       db:
         condition: service_healthy
-    environment:
-      # prisma uses this to connect
-      DATABASE_URL: postgresql://appuser:apppass@db:5432/appdb?schema=public
-      PORT: 3000
     ports:
       - "3000:3000"
 
   frontend:
-    build:
-      context: .
-      dockerfile: frontend/Dockerfile
+    image: adityavshisht/task_manager:web-1.0
     depends_on:
       - api
     ports:
