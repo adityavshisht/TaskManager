@@ -1,27 +1,56 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>TaskManager • Minimal</title>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <div class="page">
+      <header class="header">
+        <div class="brand">
+          <span class="logo">✓</span>
+          <h1>TaskManager</h1>
+        </div>
+        <div class="meta">
+          <a href="http://localhost:3000/docs" target="_blank" rel="noreferrer">API Docs</a>
+          <span class="dot">•</span>
+          <a href="http://localhost:3000/api/tasks" target="_blank" rel="noreferrer">Raw JSON</a>
+        </div>
+      </header>
 
-<head>
-    <meta charset="UTF-8">
-    <title>Task Manager</title>
-    <link rel="stylesheet" href="style.css">
-</head>
+      <main class="shell">
+        <section class="composer glass">
+          <form id="taskForm" class="form">
+            <input id="taskInput" type="text" placeholder="Add a new task…" autocomplete="off" />
+            <button type="submit" class="btn primary">Add</button>
+          </form>
+          <div class="hint">Tip: tasks are saved to your real database via the API.</div>
+        </section>
 
-<body>
-    <div class="container">
-        <h1>Task Manager</h1>
+        <section class="list glass">
+          <div class="list-head">
+            <h2>Your Tasks</h2>
+            <div class="filters" role="group" aria-label="filters">
+              <button class="chip is-active" data-filter="all">All</button>
+              <button class="chip" data-filter="open">Open</button>
+              <button class="chip" data-filter="done">Done</button>
+            </div>
+          </div>
 
-        <!-- Add Task -->
-        <form id="taskForm">
-            <input type="text" id="taskInput" placeholder="Enter task" required>
-            <button type="submit">Add Task</button>
-        </form>
+          <ul id="taskList" class="items"></ul>
+          <div class="empty hidden" id="emptyState">
+            <span>no tasks yet — add one above</span>
+          </div>
+        </section>
+      </main>
 
-        <h2>Tasks</h2>
-        <ul id="taskList"></ul>
+      <footer class="footer">
+        <span>TaskManager</span>
+      </footer>
     </div>
 
-    <script src="script.js"></script>
-</body>
-
+    <script src="./script.js" defer></script>
+  </body>
 </html>

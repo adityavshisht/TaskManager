@@ -1,65 +1,130 @@
-const apiUrl = "http://localhost:3000/tasks"; // change to your backend URL if needed
+const apiUrl = "http://localhost:3000/api/tasks";
+const usersUrl = "http://localhost:3000/api/users";
+
+let defaultUserId = 1;
+let currentFilter = "all"; // all | open | done
 
 const taskForm = document.getElementById('taskForm');
 const taskInput = document.getElementById('taskInput');
 const taskList = document.getElementById('taskList');
+const emptyState = document.getElementById('emptyState');
+const filterButtons = document.querySelectorAll('.chip[data-filter]');
 
-// Fetch and display tasks
-async function fetchTasks() {
-    taskList.innerHTML = '';
-    const res = await fetch(apiUrl);
-    const tasks = await res.json();
-    tasks.forEach(task => {
-        const li = document.createElement('li');
-        li.textContent = `${task.title} ${task.done ? "(Done)" : ""}`;
-
-        // Update button
-        const updateBtn = document.createElement('button');
-        updateBtn.textContent = task.done ? "Undo" : "Mark Done";
-        updateBtn.onclick = () => updateTask(task.id, !task.done);
-
-        // Delete button
-        const deleteBtn = document.createElement('button');
-        deleteBtn.textContent = "Delete";
-        deleteBtn.onclick = () => deleteTask(task.id);
-
-        li.appendChild(updateBtn);
-        li.appendChild(deleteBtn);
-        taskList.appendChild(li);
-    });
-}
-
-// Add a new task
-taskForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const title = taskInput.value.trim();
-    if (!title) return;
-
-    await fetch(apiUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title, done: false })
-    });
-
-    taskInput.value = '';
+filterButtons.forEach(btn => {
+  btn.addEventListener('click', () => {
+    filterButtons.forEach(b => b.classList.remove('is-active'));
+    btn.classList.add('is-active');
+    currentFilter = btn.dataset.filter;
     fetchTasks();
+  });
 });
 
-// Update task
-async function updateTask(id, done) {
-    await fetch(`${apiUrl}/${id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ done })
+async function initDefaultUser() {
+  try {
+    const res = await fetch(usersUrl);
+    const users = await res.json();
+    if (Array.isArray(users) && users.length) {
+      defaultUserId = users[0].id;
+    } else {
+      const created = await fetch(usersUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: "demo@example.com", name: "Demo" })
+      }).then(r => r.json());
+      defaultUserId = created.id;
+    }
+  } catch (e) {
+    console.error("Failed to init default user", e);
+  }
+}
+
+taskForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const title = taskInput.value.trim();
+  if (!title) return;
+  taskInput.disabled = true;
+  try {
+    await fetch(apiUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ title, userId: defaultUserId })
     });
-    fetchTasks();
+    taskInput.value = '';
+    await fetchTasks();
+  } finally {
+    taskInput.disabled = false;
+  }
+});
+
+async function fetchTasks() {
+  taskList.innerHTML = '';
+  const res = await fetch(apiUrl);
+  let tasks = await res.json();
+
+  if (currentFilter === "open") tasks = tasks.filter(t => !t.isDone);
+  if (currentFilter === "done") tasks = tasks.filter(t => t.isDone);
+
+  if (!tasks.length) {
+    emptyState.classList.remove('hidden');
+    return;
+  }
+  emptyState.classList.add('hidden');
+
+  tasks.forEach(task => {
+    const li = document.createElement('li');
+    if (task.isDone) li.classList.add('done');
+
+    const titleWrap = document.createElement('div');
+    titleWrap.className = 'item-title';
+    const badge = document.createElement('span');
+    badge.className = `badge ${task.isDone ? 'ok' : 'mute'}`;
+    badge.textContent = task.isDone ? 'done' : 'open';
+    const title = document.createElement('span');
+    title.textContent = task.title;
+    titleWrap.appendChild(badge);
+    titleWrap.appendChild(title);
+
+    const actions = document.createElement('div');
+    actions.className = 'actions';
+
+    const doneBtn = document.createElement('button');
+    doneBtn.className = 'icon-btn icon-done';
+    doneBtn.textContent = task.isDone ? 'Mark Undone' : 'Mark Done';
+    doneBtn.onclick = async () => {
+      await updateTask(task.id, { isDone: !task.isDone });
+      fetchTasks();
+    };
+
+    const delBtn = document.createElement('button');
+    delBtn.className = 'icon-btn icon-del';
+    delBtn.textContent = 'Delete';
+    delBtn.onclick = async () => {
+      await deleteTask(task.id);
+      fetchTasks();
+    };
+
+    actions.appendChild(doneBtn);
+    actions.appendChild(delBtn);
+
+    li.appendChild(titleWrap);
+    li.appendChild(actions);
+    taskList.appendChild(li);
+  });
 }
 
-// Delete task
+async function updateTask(id, data) {
+  await fetch(`${apiUrl}/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  });
+}
+
 async function deleteTask(id) {
-    await fetch(`${apiUrl}/${id}`, { method: 'DELETE' });
-    fetchTasks();
+  await fetch(`${apiUrl}/${id}`, { method: 'DELETE' });
 }
 
-// Load tasks on page load
-fetchTasks();
+(async function start() {
+  await initDefaultUser();
+  fetchTasks();
+})();

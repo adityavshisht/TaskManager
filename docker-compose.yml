@@ -1,3 +1,4 @@
+version: "3.9"
 services:
   db:
     image: postgres:16
@@ -5,9 +6,38 @@ services:
       POSTGRES_USER: appuser
       POSTGRES_PASSWORD: apppass
       POSTGRES_DB: appdb
-    ports:
-      - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U appuser -d appdb"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      # prisma uses this to connect
+      DATABASE_URL: postgresql://appuser:apppass@db:5432/appdb?schema=public
+      PORT: 3000
+    ports:
+      - "3000:3000"
+
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    depends_on:
+      - api
+    ports:
+      - "8080:80"
+
 volumes:
   pgdata:
