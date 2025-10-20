@@ -1,73 +1,97 @@
-# 🧠 TaskManager Backend
+# 🧠 TaskManager — Full Stack Web Application
 
-A simple **TypeScript + Node.js + Express + Prisma** API for managing **Users** and **Tasks**.
+A full-stack **Task Management System** built with  
+**Node.js (Express + TypeScript)**, **PostgreSQL (Prisma ORM)**, and a modern **Frontend UI** powered by **HTML, CSS, and JavaScript**.
+
+---
+
+## 📋 Overview
+
+The **TaskManager** application allows users to:
+- Create, update, and delete **tasks**
+- Assign tasks to specific **users**
+- Filter between **open** and **completed** tasks
+- Interact with a live **REST API** through a responsive web interface
 
 ---
 
 ## 🚀 Features
 
-✅ Node.js + Express + TypeScript  
-✅ PostgreSQL (Docker) + Prisma ORM  
-✅ CRUD routes for Users and Tasks  
-✅ Request validation with Zod  
-✅ Swagger API documentation at `/docs`  
-✅ Error handling + input validation  
-✅ Seed script for demo data
+✅ **Backend** (Node.js + Express + TypeScript)  
+✅ **Database** using PostgreSQL (Docker + Prisma ORM)  
+✅ **Frontend UI** with modern Business Theme  
+✅ **Validation** using Zod  
+✅ **Interactive API Docs** with Swagger at `/docs`  
+✅ **Docker Compose** setup for API, Database, and Frontend  
+✅ **Seed script** for quick demo data  
+✅ **CORS enabled** for smooth frontend-backend integration  
 
 ---
 
-## ⚙️ Installation
+## 🧱 Architecture
 
-### 1️⃣ Clone the repository
+```
+TaskManager/
+│
+├── src/                  # Backend source (Express + Prisma)
+│   ├── server.ts
+│   └── swagger.ts
+│
+├── prisma/               # Database schema & migrations
+│   └── schema.prisma
+│
+├── frontend/             # Frontend UI (HTML, CSS, JS)
+│   ├── index.html
+│   ├── style.css
+│   └── script.js
+│
+├── docker-compose.yml    # Runs DB + API + Frontend together
+├── Dockerfile            # Backend Docker image
+├── package.json          # Backend dependencies
+└── README.md
+```
+
+---
+
+## ⚙️ Setup Instructions
+
+### 🧩 1. Clone the Repository
 
 ```bash
 git clone https://github.com/yourusername/TaskManager.git
 cd TaskManager
 ```
 
-### 2️⃣ Install dependencies
+### 🐳 2. Run with Docker (Recommended)
+
+```bash
+docker compose up -d --build
+```
+
+This starts:
+- **db** → PostgreSQL database  
+- **api** → Express backend on port `3000`  
+- **frontend** → Web UI on port `8080`
+
+Then visit:  
+🔹 Frontend → [http://localhost:8080](http://localhost:8080)  
+🔹 API Docs → [http://localhost:3000/docs](http://localhost:3000)
+
+---
+
+### 🧠 3. Manual Local Setup (Optional)
+
+If you prefer running without Docker:
 
 ```bash
 npm install
-```
-
-### 3️⃣ Create environment file
-
-Create a `.env` file in the project root (see `.env.example`):
-
-```
-DATABASE_URL=postgresql://appuser:apppass@localhost:5432/appdb?schema=public
-PORT=3000
-```
-
-### 4️⃣ Run PostgreSQL (Docker)
-
-```bash
-docker compose up -d
-```
-
-or use your own local Postgres instance.
-
-### 5️⃣ Run migrations
-
-```bash
+docker compose up -d db
 npx prisma migrate dev --name init
-```
-
-### 6️⃣ Seed demo data
-
-```bash
 npm run seed
-```
-
-### 7️⃣ Start the API
-
-```bash
 npm run dev
 ```
 
-Now open:  
-👉 [http://localhost:3000/docs](http://localhost:3000/docs)
+Now open [http://localhost:3000](http://localhost:3000)
 
 ---
 
@@ -77,7 +101,7 @@ Now open:
 |---------|-----------|-------------|
 | GET | `/health` | Health check |
 | GET | `/api/users` | List all users |
-| POST | `/api/users` | Create a new user |
+| POST | `/api/users` | Create a user |
 | GET | `/api/users/:id` | Get user by ID |
 | PUT | `/api/users/:id` | Update user |
 | DELETE | `/api/users/:id` | Delete user |
@@ -90,15 +114,34 @@ Now open:
 
 ---
 
+## 🎨 Frontend Features
+
+📌 Built with HTML, CSS, and Vanilla JavaScript  
+📌 Styled using a **professional Business Theme**  
+📌 Communicates with backend using Fetch API  
+📌 Filters: *All / Open / Done*  
+📌 Real-time updates without page reloads  
+📌 Auto-creates a demo user for testing
+
+---
+
 ## 🧰 Tech Stack
 
-- **Node.js** + **TypeScript**
-- **Express.js**
-- **Prisma ORM**
-- **PostgreSQL**
-- **Zod** for validation
-- **Swagger UI** for API docs
-- **Docker** for DB container
+**Frontend:**  
+- HTML5, CSS3 (Business Theme)  
+- Vanilla JavaScript (Fetch API, async/await)
+
+**Backend:**  
+- Node.js + Express  
+- TypeScript  
+- Prisma ORM  
+- PostgreSQL (Docker)
+
+**Other Tools:**  
+- Zod (validation)  
+- Swagger (API docs)  
+- Docker Compose  
+- Nodemon, ts-node for dev
 
 ---
 
@@ -106,29 +149,37 @@ Now open:
 
 | Role | Member |
 |------|---------|
-| Backend Engineer | *You (TaskManager Team)* |
-| Frontend Engineer | TBD |
-| DevOps / Presentation | TBD |
+| Backend Engineer | *You* |
+| Frontend Engineer | *Teammate* |
+| DevOps / Presentation | *Teammate* |
 
 ---
 
-## 🏁 Run Summary
+## 📸 Screenshots
 
-```
-npm run dev
-```
-➡️ Starts local API on **http://localhost:3000**  
+| Preview | Description |
+|----------|--------------|
+| 🖼️ | **Home Interface:** Add and view tasks in a clean layout |
+| 🖼️ | **Task Added:** Instantly reflects new tasks using live API calls |
+| 🖼️ | **Task Filtering:** Toggle between Open and Done views |
+| 🖼️ | **Swagger Docs:** Self-documented API endpoints |
 
+*(These images are also included in the PowerPoint presentation.)*
+
+---
+
+## 🏁 Commands Summary
+
+```bash
+npm run dev      # Start local API server
+npm run build    # Compile TypeScript
+npm run seed     # Seed demo data
+docker compose up -d  # Run full stack
 ```
-npm run seed
-```
-➡️ Seeds example data for demo
 
 ---
 
-## 📘 License
+## 🧾 License
 
-This project is for **educational use** (LaSalle College — Information Systems).  
-Free to use, modify, and share.
-
----
+This project was developed for **LaSalle College — Information Systems (420-BD2-AS / Web Client Development)**  
+© 2025 — All rights reserved for educational use only.
