@@ -236,3 +236,17 @@ body {
   border-top: 1px solid var(--stroke);
   background: #fff;
 }
+.icon-btn.icon-edit {
+  background-color: #f5b301;
+  color: white;
+}
+.icon-btn.icon-edit:hover {
+  background-color: #d49a00;
+}
+.edit-input {
+  width: 80%;
+  padding: 4px 6px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: inherit;
+}

@@ -1,0 +1,34 @@
+# Node dependencies
+node_modules
+npm-debug.log
+yarn-error.log
+
+# Local build outputs
+dist
+build
+
+# Environment and configuration
+.env
+.env.*
+!.env.docker
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# IDE / Editor
+.vscode
+.idea
+*.swp
+
+# Git
+.git
+.gitignore
+
+# Docker-related
+docker-compose.yml
+Dockerfile
+frontend/Dockerfile
+frontend/node_modules
+frontend/dist
+frontend/build

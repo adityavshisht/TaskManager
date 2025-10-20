@@ -57,7 +57,7 @@ taskForm.addEventListener('submit', async (e) => {
 });
 
 async function fetchTasks() {
-  taskList.innerHTML = '';
+  taskList.replaceChildren();
   const res = await fetch(apiUrl);
   let tasks = await res.json();
 
@@ -87,6 +87,7 @@ async function fetchTasks() {
     const actions = document.createElement('div');
     actions.className = 'actions';
 
+    // ✅ MARK DONE / UNDONE
     const doneBtn = document.createElement('button');
     doneBtn.className = 'icon-btn icon-done';
     doneBtn.textContent = task.isDone ? 'Mark Undone' : 'Mark Done';
@@ -95,6 +96,41 @@ async function fetchTasks() {
       fetchTasks();
     };
 
+    // ✅ INLINE EDIT
+    const editBtn = document.createElement('button');
+    editBtn.className = 'icon-btn icon-edit';
+    editBtn.textContent = 'Edit';
+    editBtn.onclick = () => {
+      const input = document.createElement('input');
+      input.type = 'text';
+      input.value = task.title;
+      input.className = 'edit-input';
+      titleWrap.replaceChild(input, title);
+      input.focus();
+
+      let alreadySaved = false; // prevent double reload
+
+      async function save(newTitle) {
+        if (alreadySaved) return;
+        alreadySaved = true;
+        if (newTitle && newTitle.trim() !== task.title) {
+          await updateTask(task.id, { title: newTitle.trim() });
+        }
+        fetchTasks();
+      }
+
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') save(input.value);
+        if (e.key === 'Escape') {
+          alreadySaved = true;
+          fetchTasks();
+        }
+      });
+
+      input.addEventListener('blur', () => save(input.value));
+    };
+
+    // ✅ DELETE
     const delBtn = document.createElement('button');
     delBtn.className = 'icon-btn icon-del';
     delBtn.textContent = 'Delete';
@@ -104,6 +140,7 @@ async function fetchTasks() {
     };
 
     actions.appendChild(doneBtn);
+    actions.appendChild(editBtn);
     actions.appendChild(delBtn);
 
     li.appendChild(titleWrap);
